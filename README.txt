@@ -1,5 +1,8 @@
-SISTEMA DE DETECÇÃO DE ROSTO - FOTO 3x4
-Computação Distribuída
+Cortador de Foto 3x4
+O sistema recebe uma imagem pelo navegador, coloca ela numa fila (RabbitMQ) e um
+worker processa em segundo plano: detecta o rosto com OpenCV e gera um recorte
+no formato de foto 3x4. O status do processamento é guardado num cache (Redis)
+para leitura rápida.
 
 CONCEITOS USADOS:
 - API (Django) que recebe o upload e responde em JSON
@@ -27,9 +30,5 @@ COMO RODAR:
 PAINEL DO RABBITMQ:
    http://localhost:15672  (login: guest / senha: guest)
 
-OBS: a imagem precisa ter um rosto humano de frente.
-
-ENDEREÇOS DA API:
-   POST /upload/              -> envia a imagem
-   GET  /lista/               -> lista as imagens
-   GET  /status/<id>/         -> status (tenta o Redis primeiro)
+Parar:
+   docker-compose down
