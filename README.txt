@@ -1,4 +1,7 @@
-Cortador de Foto 3x4
+Matheus Pereira Garbossa - 1120451
+
+Gabriel Gomes Estery - 1129513
+
 O sistema recebe uma imagem pelo navegador, coloca ela numa fila (RabbitMQ) e um
 worker processa em segundo plano: detecta o rosto com OpenCV e gera um recorte
 no formato de foto 3x4. O status do processamento é guardado num cache (Redis)
