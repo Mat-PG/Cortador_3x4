@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Detecção de Rosto</title>
+    <style>
+        body { font-family: Arial; background: #f0f0f0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; }
+        h1 { color: #333; }
+        .upload { margin: 20px 0; padding: 20px; background: #f9f9f9; border: 2px dashed #007bff; border-radius: 8px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .baixar { background: #28a745; }
+        .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
+        .item { background: #f9f9f9; border-radius: 8px; overflow: hidden; }
+        .item img { width: 100%; height: 200px; object-fit: cover; }
+        .item .info { padding: 12px; }
+        .status { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Detecção de Rosto - Foto 3x4</h1>
+
+        <div class="upload">
+            <input type="file" id="arquivo" accept="image/*">
+            <button onclick="enviar()">Enviar</button>
+            <span id="msg"></span>
+        </div>
+
+        <div id="galeria" class="galeria"></div>
+    </div>
+
+    <script>
+        function enviar() {
+            const arquivo = document.getElementById('arquivo').files[0];
+            if (!arquivo) { alert('Selecione uma imagem'); return; }
+
+            const dados = new FormData();
+            dados.append('imagem', arquivo);
+            document.getElementById('msg').textContent = 'Enviando...';
+
+            fetch('/upload/', { method: 'POST', body: dados })
+                .then(r => r.json())
+                .then(() => {
+                    document.getElementById('msg').textContent = 'Enviado! Processando...';
+                    document.getElementById('arquivo').value = '';
+                    carregar();
+                })
+                .catch(() => { document.getElementById('msg').textContent = 'Erro ao enviar'; });
+        }
+
+        function carregar() {
+            fetch('/lista/')
+                .then(r => r.json())
+                .then(dados => {
+                    const galeria = document.getElementById('galeria');
+                    if (dados.imagens.length === 0) {
+                        galeria.innerHTML = '<p>Nenhuma imagem ainda</p>';
+                        return;
+                    }
+                    galeria.innerHTML = dados.imagens.map(img => {
+                        let botao = '';
+                        if (img.status === 'concluido' && img.processada) {
+                            botao = '<br><a href="' + img.processada + '" download><button class="baixar">Baixar 3x4</button></a>';
+                        }
+                        return `
+                            <div class="item">
+                                <img src="${img.original}">
+                                <div class="info">
+                                    <div class="status">${img.status.toUpperCase()}</div>
+                                    ${botao}
+                                </div>
+                            </div>`;
+                    }).join('');
+                });
+        }
+
+        carregar();
+        setInterval(carregar, 5000);
+    </script>
+</body>
+</html>
